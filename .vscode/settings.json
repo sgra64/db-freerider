@@ -1,0 +1,32 @@
+{
+    "sqltools.connections": [
+        {
+            "mysqlOptions": {
+                "authProtocol": "default"
+            },
+            "previewLimit": 50,
+            "server": "localhost",
+            "port": 3306,
+            "driver": "MySQL",
+            "database": "FREERIDER_DB",
+            "username": "freerider",
+            "password": "free.ride",
+            "name": "FREERIDER_DB",
+            "connectionTimeout": 15
+        },
+        {
+            "mysqlOptions": {
+                "authProtocol": "default"
+            },
+            "previewLimit": 50,
+            "server": "localhost",
+            "port": 3306,
+            "driver": "MySQL",
+            "name": "MYSQL_DB",
+            "database": "mysql",
+            "username": "root",
+            "password": "password",
+            "connectionTimeout": 15
+        }
+    ]
+}
