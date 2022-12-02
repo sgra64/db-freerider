@@ -1,4 +1,5 @@
 # based on mysql:8.0 base image: https://hub.docker.com/_/mysql, v8:0
+# Mac with M1-Chip use: FROM --platform=linux/amd64 mysql:8.0
 FROM mysql:8.0
 
 ## Dockerfile is used to create an image built on a base image:

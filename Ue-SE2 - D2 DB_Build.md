@@ -182,6 +182,12 @@ db-freerider_MySQLServer                # container_name
 
 using `Dockerfile` (must be in same directory):
 
+Mac's with M1 Chip need to use `FROM --platform=linux/amd64 mysql:8.0`
+in Dockerfile, see:
+*"Choosing the right Docker Image for your Apple M1 Pro"*,
+[link](https://collabnix.com/choosing-the-right-docker-image-for-your-apple-m1-pro).
+
+
 ```py
 echo "building image: ${image_name}"
 docker build -t "${image_name}" --no-cache .    # . use Dockerfile here
