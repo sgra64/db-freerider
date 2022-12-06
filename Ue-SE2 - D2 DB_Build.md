@@ -93,9 +93,11 @@ Create the structure (scaffold) for project `db-freerider`:
  +--.gitignore              <-- git .gitignore file
  +--Dockerfile              <-- Dockerfile to build MySQL-image
  +--docker-compose.yaml     <-- Compose file for container lifecycle
+ +--.env.sh                 <-- project .env file, source with: source .env.sh
  |
  +--<db.mnt>:               <-- directory mounted inside the container
  |    |
+ |    +--.env.sh            <-- container .env file, source with: source .env.sh
  |    +--my.cnf             <-- mysqld config file
  |    +--init_users.sql           <-- DB-init file, users
  |    +--init_freerider_schema.sql  <-- DB-init file, FREERIDER_DB schema
