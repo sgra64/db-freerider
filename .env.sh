@@ -1,7 +1,9 @@
 ###########################################################################
-# Project environment variables and commands.
+# Project-specific environment inside MySQL container. Source with:
 # Source settings with: source .env.sh
 #
+# inherit MYSQL_HOME from .bashrc or specify here
+#MYSQL_HOME="/c/Program Files/MySQL/MySQL Workbench 8.0 CE"
 export project_path="$(pwd -LP)"
 export image_name="mysql/db-freerider_img:8.0"
 export container_name="db-freerider_MySQLServer"
@@ -11,16 +13,28 @@ export MYSQL_USER="freerider"
 export MYSQL_PASSWORD="free.ride"
 export MYSQL_ROOT_PASSWORD="password"
 
-# overload mysql client command
+
+# Overload mysql client command with project-specific settings.
 function mysql() {
     "${MYSQL_HOME}/mysql" \
         --default-character-set=utf8 \
+        --host=localhost --port=3306 \
         --user="${MYSQL_USER}" --password="${MYSQL_PASSWORD}" \
+        "${MYSQL_DATABASE}" \
+    ;
+}
+
+# mysql script for root access.
+function mysql_root() {
+    "${MYSQL_HOME}/mysql" \
+        --default-character-set=utf8 \
+        --host=localhost --port=3306 \
+        --user="root" --password="${MYSQL_ROOT_PASSWORD}" \
     ;
 }
 
 
-# local docker command
+# Overload docker commands with project-specific settings.
 function dock() {
   select="${1}"   # first arg, arg[1]: selector
   args="${@:2}"   # remaining args
@@ -144,6 +158,5 @@ function dock_env() {
     echo " - \${MYSQL_ROOT_PASSWORD}: ${MYSQL_ROOT_PASSWORD}"
     echo " - mysql --default-character-set=utf8 --user=${MYSQL_USER} --password=${MYSQL_PASSWORD}"
 }
-#
 # - - - - - - - - - - -
 #
