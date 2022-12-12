@@ -55,7 +55,10 @@ function dock() {
     start)  cmd="docker start \"${container_name}\""
         ;;
 
-    stop)   cmd="docker stop \"${container_name}\""
+    stop)   # cmd="docker stop \"${container_name}\""
+            # use graceful shutdown executing shutdown.sh script
+            cmd="echo \"cat /mnt/shutdown.sh | /bin/bash\" | \
+                    docker exec -i \"${container_name}\" /bin/bash"
         ;;
 
     bash)   cmd="docker exec -it \"${container_name}\" /bin/bash"
@@ -63,6 +66,9 @@ function dock() {
 
     logs)   cmd="docker logs \"${container_name}\""
         ;;
+
+    top)    cmd="docker top \"${container_name}\""
+        ;;  # show processes running inside the container
 
     clean)  func="dock_clean"
         ;;  # clean container and image using function
@@ -86,7 +92,7 @@ function dock() {
     echo " - ${cmd} build_img"
     echo " - ${cmd} build"
     echo " - ${cmd} start | stop"
-    echo " - ${cmd} bash  | logs | clean"
+    echo " - ${cmd} bash  | logs | top | clean"
   fi
 }
 
@@ -122,40 +128,41 @@ function dock_build_container() {
     #
     # create container from image
     docker run \
-        --name=${container_name} \
+        --name="${container_name}" \
         \
-        --env MYSQL_DATABASE=\"${MYSQL_DATABASE}\" \
-        --env MYSQL_USER=\"${MYSQL_USER}\" \
-        --env MYSQL_PASSWORD=\"${MYSQL_PASSWORD}\" \
-        --env MYSQL_ROOT_PASSWORD=\"${MYSQL_ROOT_PASSWORD}\" \
+        --env MYSQL_DATABASE="${MYSQL_DATABASE}" \
+        --env MYSQL_USER="${MYSQL_USER}" \
+        --env MYSQL_PASSWORD="${MYSQL_PASSWORD}" \
+        --env MYSQL_ROOT_PASSWORD="${MYSQL_ROOT_PASSWORD}" \
         \
         --publish 3306:3306 \
-        --mount type=bind,src=${project_path}/db.mnt,dst=/mnt \
-        -d ${image_name}
+        --mount type=bind,src="${project_path}/db.mnt",dst="/mnt" \
+        -d "${image_name}"
     #
 }
 
 function dock_clean() {
     #
     # clear container, image and db_data and db_logs files
-    docker stop ${container_name}; \
-    docker rm ${container_name}; \
-    docker rmi ${image_name}; \
-    rm -rf db.mnt/db_data/* db.mnt/db_logs/*; \
-    touch db.mnt/db_data/.touch; \
-    touch db.mnt/db_logs/.touch;
+    docker stop "${container_name}"
+    docker rm "${container_name}"
+    docker rmi "${image_name}"
+    docker volume prune -f
+    rm -rf db.mnt/db_data/* db.mnt/db_logs/*
+    touch db.mnt/db_data/.touch
+    touch db.mnt/db_logs/.touch
     #
 }
 
 function dock_env() {
     # echo "project environment sourced with:"
-    echo " - \${project_path}:   ${project_path}"
-    echo " - \${image_name}:     ${image_name}"
-    echo " - \${container_name}: ${container_name}"
-    echo " - \${MYSQL_DATABASE}:      ${MYSQL_DATABASE}"
-    echo " - \${MYSQL_USER}:          ${MYSQL_USER}"
-    echo " - \${MYSQL_PASSWORD}:      ${MYSQL_PASSWORD}"
-    echo " - \${MYSQL_ROOT_PASSWORD}: ${MYSQL_ROOT_PASSWORD}"
+    echo " - \${project_path}:   \"${project_path}\""
+    echo " - \${image_name}:     \"${image_name}\""
+    echo " - \${container_name}: \"${container_name}\""
+    echo " - \${MYSQL_DATABASE}:      \"${MYSQL_DATABASE}\""
+    echo " - \${MYSQL_USER}:          \"${MYSQL_USER}\""
+    echo " - \${MYSQL_PASSWORD}:      \"${MYSQL_PASSWORD}\""
+    echo " - \${MYSQL_ROOT_PASSWORD}: \"${MYSQL_ROOT_PASSWORD}\""
     echo " - mysql --default-character-set=utf8 --user=${MYSQL_USER} --password=${MYSQL_PASSWORD}"
 }
 # - - - - - - - - - - -
