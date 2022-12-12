@@ -90,26 +90,31 @@ Create the structure (scaffold) for project `db-freerider`:
 ```
 --<db-freerider>:           <-- new database build project
  |
+ +--.env.sh                 <-- project .env file to source shell: source .env.sh
  +--.gitignore              <-- git .gitignore file
  +--Dockerfile              <-- Dockerfile to build MySQL-image
  +--docker-compose.yaml     <-- Compose file for container lifecycle
- +--.env.sh                 <-- project .env file, source with: source .env.sh
  |
- +--<db.mnt>:               <-- directory mounted inside the container
+ +--<db.mnt>:               <-- directory mounted inside the container under: /mnt
+ |    +--.env.sh            <-- container .env file, source with: source /mnt/.env.sh 
+ |    +--my.cnf             <-- mysqld config file (linked to /etc/mysql/conf.d/my.cnf)
  |    |
- |    +--.env.sh            <-- container .env file, source with: source .env.sh
- |    +--my.cnf             <-- mysqld config file
- |    +--init_users.sql           <-- DB-init file, users
- |    +--init_freerider_schema.sql  <-- DB-init file, FREERIDER_DB schema
- |    +--init_freerider_data.sql    <-- DB-init file, FREERIDER_DB data
+ |    +--init_freerider_schema.sql  <-- DB init files (schema)
+ |    +--init_freerider_data.sql    <-- DB init files (data)
+ |    +--init_users.sql             <-- DB init files (users, remote access)
+ |    |
+ |    +--data_customers.sql         <-- DB full dataset (customers)
+ |    +--data_reservations.sql      <-- DB full dataset (reservations)
+ |    +--data_vehicles.sql          <-- DB full dataset (vehicles)
  |    |
  |    +--db_data            <-- mysqld database files (residing in host fs)
  |    |    +--.touch        <-- empty file to commit empty db_data directory
  |    |    |
  |    |    +--FREERIDER_DB  <-- later: mysqld FREERIDER_DB files
  |    |
- |    +--db_logs            <-- mysqld log files (exported to host environment)
+ |    +--db_logs            <-- mysqld log files (mounted to /var/log/mysql)
  |    |    +--.touch        <-- empty file to commit empty db_logs directory
+ |    |
 ```
 1. Create the project directory `db-freerider` and copy files .gitignore,
     Dockerfile, docker-compose.yaml into the directory.
@@ -130,7 +135,13 @@ find .
 
 Output:
 ```
+.
+./.env.sh
 ./db.mnt
+./db.mnt/.env.sh
+./db.mnt/data_customers.sql         <-- DB full dataset (customers)
+./db.mnt/data_reservations.sql      <-- DB full dataset (reservations)
+./db.mnt/data_vehicles.sql          <-- DB full dataset (vehicles)
 ./db.mnt/db_data
 ./db.mnt/db_data/.touch
 ./db.mnt/db_logs
@@ -141,7 +152,6 @@ Output:
 ./db.mnt/my.cnf
 ./docker-compose.yaml
 ./Dockerfile
-./docker_scripts.sh
 ```
 
 (2 Pts)
@@ -157,15 +167,20 @@ base image.
 
 The new image will be called: `mysql/db-freerider_img:8.0`
 and the new container: `db-freerider_MySQLServer`.
-Names are stored in shell-variables.
+Names are stored in shell-variables that are *"sourced"* from the
+project `.env.sh` file. Using *.env*-files has become popular to set
+project-specific variables and functions (customized shell commands).
+
+Source the project:
 
 ```perl
-# set variable with full local path to project
-project_path="$(pwd -LP)"
+cd <project_directory>
 
-# set image and container names for MySQL server
-image_name="mysql/db-freerider_img:8.0"
-container_name="db-freerider_MySQLServer"
+# show project definitions in project .env file
+cat .env.sh
+
+# source the project (with env vars: project_path, image_name, container_name)
+source .env.sh
 
 # show variable values
 echo ${project_path}
@@ -176,10 +191,14 @@ echo ${container_name}
 Output:
 
 ```sh
-/c/svgr/workspaces/2-SE/db-freerider    # path on your laptop
+/c/svgr/workspaces/2-SE/db-freerider    # path to project on your laptop
 mysql/db-freerider_img:8.0              # image_name
 db-freerider_MySQLServer                # container_name
 ```
+
+Make sure environment variables have been set **BEFORE** building the image.
+
+
 
 **Step 1: Building the image**
 
@@ -243,23 +262,69 @@ Mount points must be enabled by the host system. With Docker Desktop, open:
 The full docker command for creating the container is:
 ```sh
 docker run \
-    --name=${container_name} \
+    --name="${container_name}" \
     \
-    --env MYSQL_DATABASE='FREERIDER_DB' \
-    --env MYSQL_USER='freerider' \
-    --env MYSQL_PASSWORD='free.ride' \
-    --env MYSQL_ROOT_PASSWORD='password' \
+    --env MYSQL_DATABASE="FREERIDER_DB" \
+    --env MYSQL_USER="freerider" \
+    --env MYSQL_PASSWORD="free.ride" \
+    --env MYSQL_ROOT_PASSWORD="password" \
     \
     --publish 3306:3306 \
-    --mount type=bind,src=${project_path}/db.mnt,dst=/mnt \
-    -d ${image_name}
+    --mount type=bind,src="${project_path}/db.mnt",dst="/mnt" \
+    -d "${image_name}"
 ```
 
 Docker Desktop will display the new, running container (green box):
 
 ![Datamodel](./img_02.png)
 
-Showing the running MySQL container using `docker ps`.
+
+**IMPORTANT:**
+
+While the container has been created and started (with `docker run`), the
+database server process *mysqld* needs to complete the initialization
+process before it can be used.
+
+Wait for *mysqld* to finish the setup phase.
+
+Wait for log-lines from container:
+
+```perl
+# show container logs
+docker logs "${container_name}"
+
+# alternatively, use 'dock' shortcut command from .env.sh
+dock logs
+```
+
+Output (ignore Warnings):
+
+```
+docker logs "db-freerider_MySQLServer"
+2022-12-12 20:06:19+00:00 [Note] [Entrypoint]: Entrypoint script for MySQL Server 8.0.31-1.el8 started.
+...
+2022-12-12 20:06:20+00:00 [Note] [Entrypoint]: Initializing database files
+2022-12-12 20:06:37+00:00 [Note] [Entrypoint]: Database files initialized
+2022-12-12 20:06:37+00:00 [Note] [Entrypoint]: Starting temporary server
+2022-12-12 20:06:45+00:00 [Note] [Entrypoint]: Temporary server started.
+'/var/lib/mysql/mysql.sock' -> '/var/run/mysqld/mysqld.sock'
+...
+2022-12-12 20:06:52+00:00 [Note] [Entrypoint]: Creating database "FREERIDER_DB"
+2022-12-12 20:06:52+00:00 [Note] [Entrypoint]: Creating user "freerider"
+2022-12-12 20:06:52+00:00 [Note] [Entrypoint]: Giving user "freerider" access to schema "FREERIDER_DB"
+
+2022-12-12 20:06:52+00:00 [Note] [Entrypoint]: /usr/local/bin/docker-entrypoint.sh: running /docker-entrypoint-initdb.d/db_init.sql
+
+2022-12-12 20:06:53+00:00 [Note] [Entrypoint]: Stopping temporary server
+2022-12-12 20:06:55+00:00 [Note] [Entrypoint]: Temporary server stopped
+
+2022-12-12 20:06:55+00:00 [Note] [Entrypoint]: MySQL init process done. Ready for start up.
+```
+
+Wait for: `MySQL init process done. Ready for start up`.
+
+
+Show the running MySQL container:
 
 ```sh
 docker ps
@@ -271,18 +336,51 @@ er
 
 ```
 
-With the running database server, a `mysql` client can connect from
-either the host system (if you have a mysql client installed) or from
-within the container by attaching a bash shell:
+Show the running `mysqld` database server inside the MySQL container:
 
-```sh
-docker exec -it "${container_name}" /bin/bash
-
-bash-4.4#                   # bash inside the container
-bash-4.4#ls -la
+```
+docker top "${container_name}"
+UID                 PID                 PPID                C
+STIME               TTY                 TIME                CMD
+999                 13492               13466               2
+21:44               ?                   00:00:07            mysqld    <--
+root                13785               13466               0
+21:48               ?                   00:00:00            /bin/sh
 ```
 
-Invoke *mysql* - client:
+
+With the running database server, a `mysql` client can connect from
+either the host system (if you have a mysql client installed on your laptop)
+or from within the container by attaching a bash shell:
+
+```
+dock bash               # using 'dock' command from .env.sh
+                        # or with full docker command:
+docker exec -it "${container_name}" /bin/bash
+
+bash-4.4#                # bash running inside the container
+bash-4.4# ls -la         # show file system inside the container
+```
+
+The database server process `mysqld` needs to be shutdown gracefully in order
+to avoid data corruption. The SQL-shutdown statement can be used to shut down
+the database server:
+
+```sql
+mysql> shutdown;
+```
+
+In order to also end the container, the `dock` command from `.env.sh` can be
+used:
+
+```
+dock stop           # shut down mysqld gracefully and stop container
+dock start          # restart the container and mysqld server process
+```
+
+When the container and the `mysqld` - server process within the container are running,
+the `mysql` - client can connect:
+
 ```
 bash-4.4# mysql --user=freerider --password=free.ride
 
@@ -300,7 +398,7 @@ Type 'help;' or '\h' for help. Type '\c' to clear the current input statement.
 mysql>
 ```
 
-The client is connected to the server. SQL commands can be entered:
+when the client is connected to the server, SQL commands can be entered:
 ```
 mysql> show databases;
 +--------------------+
@@ -470,7 +568,7 @@ cat /mnt/init_freerider_data.sql | mysql --user=freerider --password=free.ride
 
 ---
 ### 6.) Challenge 6
-With data, DB Queries can be executed:
+Execute DB Queries:
 
 ```
 bash-4.4# mysql --user=freerider --password=free.ride
