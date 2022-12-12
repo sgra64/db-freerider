@@ -98,6 +98,7 @@ Create the structure (scaffold) for project `db-freerider`:
  +--<db.mnt>:               <-- directory mounted inside the container under: /mnt
  |    +--.env.sh            <-- container .env file, source with: source /mnt/.env.sh 
  |    +--my.cnf             <-- mysqld config file (linked to /etc/mysql/conf.d/my.cnf)
+ |    +--shutdown.sh        <-- mysqld shutdown script
  |    |
  |    +--init_freerider_schema.sql  <-- DB init files (schema)
  |    +--init_freerider_data.sql    <-- DB init files (data)
