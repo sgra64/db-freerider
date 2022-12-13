@@ -302,7 +302,7 @@ Output (with border lines):
 
 Repeat in IDE (here with Visual Studio Code SQLTools extension):
 
-![Customer Query with SQLTools](./img_05.png)
+![Customer Query with SQLTools](./img_30.png)
 
 
 (2 Pts)
