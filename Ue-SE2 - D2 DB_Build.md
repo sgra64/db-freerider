@@ -20,7 +20,7 @@ Goal of this assignment is to build the database for a car sharing application
 *freerider* from a datamodel that is suitable for managing reservations:
 
 Data-model for `FREERIDER_DB`:
-![Datamodel](./img_01.png)
+![Datamodel](./img_20_UML.png)
 
 - Type `Location` is a `String` for pickup or drop location.
 
@@ -155,6 +155,15 @@ Output:
 ./Dockerfile
 ```
 
+The directory `./db.mnt` in the project directory (on the host system) is *"mounted"*
+as volume into the container under the path `/mnt`. It means, all files under `./db.mnt`
+are available inside the container under path `/mnt`.
+
+The picture from lecture shows the relation between the host system (laptop) and the
+database container.
+
+![Datamodel](./img_22.jpg)
+
 (2 Pts)
 
 
@@ -277,7 +286,7 @@ docker run \
 
 Docker Desktop will display the new, running container (green box):
 
-![Datamodel](./img_02.png)
+![Datamodel](./img_23.png)
 
 
 **IMPORTANT:**
@@ -463,7 +472,7 @@ type `Reservation` representing the reservation relation between a CUSTOMER
 and a VEHICLE with two FOREIGN KEY (FK) attributes: `CUSTOMER_ID` and
 `VEHICLE_ID`.
 
-![ERD](./db.schema/freerider_ERD.png)
+![ERD](./img_21_ERD.png)
 
 [./db.mnt/init_freerider_schema.sql](https://github.com/sgra64/db-freerider/blob/main/db.mnt/init_freerider_schema.sql) contains the `SQL-Schema`,
 which starts with removing the old schema (and data) from the database
@@ -520,7 +529,7 @@ the extension [SQLTools](https://marketplace.visualstudio.com/items?itemName=mtx
 to the FREERIDER_DB with created tables (installation of an IDE plugin is
 recommended, but not required).
 
-![SQLTools](./img_03.png)
+![SQLTools](./img_24.png)
 
 The loaded database schema can be displayed with SQL:
 ```
@@ -529,7 +538,7 @@ mysql> describe VEHICLE;
 mysql> describe RESERVATION;
 ```
 
-![SCHEMA](./img_04.png)
+![SCHEMA](./img_25.png)
 
 (3 Pts)
 
@@ -559,8 +568,6 @@ and pipe into the database:
 ```
 cat /mnt/init_freerider_data.sql | mysql --user=freerider --password=free.ride
 ```
-
-
 
 (1 Pt)
 
