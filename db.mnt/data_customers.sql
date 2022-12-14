@@ -1,5 +1,6 @@
 USE FREERIDER_DB;
 
+DELETE FROM RESERVATION;    -- avoid FOREIGN KEY dependency
 DELETE FROM CUSTOMER;
 INSERT INTO CUSTOMER (ID, NAME, CONTACT, STATUS) VALUES
     (1, 'Meyer, Eric', 'eme22@gmail.com', 'Active'),
