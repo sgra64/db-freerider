@@ -22,7 +22,9 @@ operations in a database for:
 4. [Challenge 4:](#4-challenge-4) Running Queries - (2 Pts)
 5. [Challenge 5:](#5-challenge-5) Updating Data - (2 Pts)
 
-Refer to ["known issues"](https://github.com/sgra64/docker-se2/blob/main/Ue-SE2%20-%20D_Docker.md#known-issues) for Apple *M1* processor and for use with *GitBash*. 
+Refer to [known issues](https://github.com/sgra64/db-freerider/blob/main/Known_Issues.md)
+for problems.
+
 
 &nbsp;
 
