@@ -47,11 +47,35 @@ docker run \
 ```
 
 This means that Host-directory: `${project_path}/db.mnt` is not visible inside
-the container. Its content must be added in Dockerfile when the image is built:
+the container. Its content must be added in Dockerfile and copied into the
+image when it is built:
 
-1. zip `db.mnt` in Host system.
+1. zip `db.mnt` in Host system (use Unix `tar` command to zip).
 1. `ADD` .zip file to container image (in Dockerfile)
 1. `RUN` unzip in Dockerfile to place content under path `/mnt`.
+
+```perl
+tar cvf db.mnt.tar db.mnt           # zip/tar directory db.mnt to db.mnt.tar
+
+ADD db.mnt.tar /tmp                     # add .tar to image under /tmp
+RUN tar -xf /tmp/db.mnt.tar -C /mnt     # unpack archive to /mnt
+```
+
+If this does not work, use the mysql base image `mysql:8.0` to create the
+container:
+
+```perl
+docker run \
+    --name="${container_name}" \
+    \
+    --env MYSQL_DATABASE="${MYSQL_DATABASE}" \
+    --env MYSQL_USER="${MYSQL_USER}" \
+    --env MYSQL_PASSWORD="${MYSQL_PASSWORD}" \
+    --env MYSQL_ROOT_PASSWORD="${MYSQL_ROOT_PASSWORD}" \
+    \
+    --publish 3306:3306 \
+    -d "mysql:8.0"                  # <-- use mysql base image
+```
 
 References:
 - *"Docker Bind Mounts"*,
