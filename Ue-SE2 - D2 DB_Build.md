@@ -31,8 +31,6 @@ Data-model for `FREERIDER_DB`:
     `Enum: ['Gasoline', 'Diesel', 'Electric', 'Hybrid', 'Hydrogen']`.
 
 
-&nbsp;
-
 ---
 ### Challenges
 1. [Challenge 1:](#1-challenge-1) Create DB project structure (scaffolding) - (2 Pts)
@@ -43,7 +41,9 @@ Data-model for `FREERIDER_DB`:
 6. [Challenge 6:](#6-challenge-6) Run DB Query - (1 Pts)
 7. [Challenge 7:](#7-challenge-7) Delete and rebuild DB from scratch - (2 Pts)
 
-Refer to ["known issues"](https://github.com/sgra64/docker-se2/blob/main/Ue-SE2%20-%20D_Docker.md#known-issues) for Apple *M1* processor and for use with *GitBash*. 
+Refer to [known issues](https://github.com/sgra64/db-freerider/blob/main/Known_Issues.md)
+for problems.
+
 
 &nbsp;
 
