@@ -3,7 +3,7 @@
 ---
 Known issues capture problems and describe solutions.
 
-1. [Issue 1:](https://github.com/sgra64/docker-se2/blob/main/Known_Issues.md#1-issue-1)
+1. [Issue 1:](#1-issue-1)
     Mac with *M1*-CPU:  *"image platform does not match host platform"*
 2. [Issue 2:](https://github.com/sgra64/docker-se2/blob/main/Known_Issues.md#2-issue-2)
     with *GitBash*: *"failed to create shim task: OCI runtime create failed"*
@@ -13,6 +13,29 @@ Known issues capture problems and describe solutions.
     *Windows HOME*.
 5. [Issue 5:](#5-issue-5) *mysql_root*, *mysql --user=root ...* access denied
 6. [Issue 6:](#6-issue-6) *mysql* access denied
+
+
+&nbsp;
+
+---
+
+### 1.) Issue 1:
+
+Error on Mac with *M1*-Chip: *"The requested image's platform (linux/amd64) does not match the detected host platform"*.
+
+- Solution I: use the `arm64v8/mysql:8.0` image instead of `mysql:8.0`
+in Dockerfile, see article: *Emmanuel Gautier:*
+[MySQL Docker Image for Mac ARM M1](https://www.emmanuelgautier.com/blog/mysql-docker-arm-m1), Feb 2022.
+    ```
+    FROM arm64v8/mysql:8.0
+    ```
+
+- Solution II: try `--platform=linux/amd64` before `mysql:8.0` in Dockerfile:
+
+    ```
+    FROM --platform=linux/amd64 adoptopenjdk/openjdk11:alpine
+    ```
+
 
 &nbsp;
 
