@@ -9,10 +9,10 @@ Known issues capture problems and describe solutions.
     with *GitBash*: *"failed to create shim task: OCI runtime create failed"*
 3. [Issue 3:](https://github.com/sgra64/docker-se2/blob/main/Known_Issues.md#3-issue-3)
     with *GitBash*: *"the input device is not a TTY"*
-4. [Issue 4:](#4-issue-4) No *File Sharing* option in Docker Desktop with
+4. [Issue 4:](#5-issue-4) *mysql_root*, *mysql --user=root ...* access denied
+5. [Issue 5:](#6-issue-5) *mysql* access denied
+6. [Issue 6:](#4-issue-6) No *File Sharing* option in Docker Desktop with
     *Windows HOME*.
-5. [Issue 5:](#5-issue-5) *mysql_root*, *mysql --user=root ...* access denied
-6. [Issue 6:](#6-issue-6) *mysql* access denied
 7. [Issue 7:](#7-issue-7-container-mount-not-working) Container mount not working
 8. [Issue 8:](#8-issue-8-client-does-not-support-authentication-protocol) Client does not support authentication protocol
 
@@ -44,76 +44,6 @@ in Dockerfile, see article: *Emmanuel Gautier:*
 ---
 
 ### 4.) Issue 4
-Problem: *Windows HOME* edition does not allow mounting directories
-from the Host-system into containers.
-Docker Desktop does not show the `File sharing` option to add a host
-path as sharable mount point:
-
-Docker Desktop Settings:
-```perl
--> Settings -> Resources -> File sharing    # not present for Win HOME
-```
-
-The solution is to upgrade Windows from *HOME* to *Pro* or to not use
-shared volumes by ommitting the `--mount` flag during container build:
-
-```perl
-docker run \
-    --name="${container_name}" \
-    \
-    --env MYSQL_DATABASE="${MYSQL_DATABASE}" \
-    --env MYSQL_USER="${MYSQL_USER}" \
-    --env MYSQL_PASSWORD="${MYSQL_PASSWORD}" \
-    --env MYSQL_ROOT_PASSWORD="${MYSQL_ROOT_PASSWORD}" \
-    \
-    --publish 3306:3306 \
-    --mount type=bind,src="${project_path}/db.mnt",dst="/mnt" \     # <-- remove
-    -d "${image_name}"
-```
-
-This means that Host-directory: `${project_path}/db.mnt` is not visible inside
-the container. Its content must be added in Dockerfile and copied into the
-image when it is built:
-
-1. zip `db.mnt` in Host system (use Unix `tar` command to zip).
-1. `ADD` .zip file to container image (in Dockerfile)
-1. `RUN` unzip in Dockerfile to place content under path `/mnt`.
-
-```perl
-tar cvf db.mnt.tar db.mnt           # zip/tar directory db.mnt to db.mnt.tar
-
-ADD db.mnt.tar /tmp                     # add .tar to image under /tmp
-RUN tar -xf /tmp/db.mnt.tar -C /mnt     # unpack archive to /mnt
-```
-
-If this does not work, use the mysql base image `mysql:8.0` to create the
-container:
-
-```perl
-docker run \
-    --name="${container_name}" \
-    \
-    --env MYSQL_DATABASE="${MYSQL_DATABASE}" \
-    --env MYSQL_USER="${MYSQL_USER}" \
-    --env MYSQL_PASSWORD="${MYSQL_PASSWORD}" \
-    --env MYSQL_ROOT_PASSWORD="${MYSQL_ROOT_PASSWORD}" \
-    \
-    --publish 3306:3306 \
-    -d "mysql:8.0"                  # <-- use mysql base image
-```
-
-References:
-- *"Docker Bind Mounts"*,
-[Docker docs](https://docs.docker.com/storage/bind-mounts).
-- *"Docker Volumes"*,
-[Docker docs](https://docs.docker.com/storage/volumes).
-
-
-&nbsp;
-
----
-
-### 5.) Issue 5
 The problem `mysql --user=root --password=password` access denied
 occurs when the container image was built without *"sourcing"*.
 
@@ -140,7 +70,7 @@ settings in `/mnt/.env.sh`.
 
 ---
 
-### 6.) Issue 6
+### 5.) Issue 5
 The problem `mysql` access denied occurs when the database user *freerider*
 does not exist. This typically occurs when the container image is built
 unsourced (`source .env.sh ` was not executed).
@@ -186,6 +116,27 @@ Output:
 +-----------+------------------+
 6 rows in set (0.00 sec)
 ```
+
+
+&nbsp;
+
+---
+
+### 6.) Issue 6
+Problem: *Windows HOME* edition does not allow mounting directories
+from the Host-system into containers.
+Docker Desktop does not show the `File sharing` option to add a host
+path as sharable mount point:
+
+Docker Desktop Settings:
+```perl
+-> Settings -> Resources -> File sharing    # not present for Win HOME
+```
+
+The solution is to upgrade Windows from *HOME* to *Pro* or to not use
+shared volumes by ommitting the `--mount` flag during container build,
+follow instructions in [Issue 7: Container mount not working](#7-issue-7-container-mount-not-working)
+below.
 
 
 &nbsp;
@@ -408,6 +359,13 @@ mysql> select * from CUSTOMER;
 +----+--------------+-----------------+--------+
 3 rows in set (0.00 sec)
 ```
+
+
+References:
+- *"Docker Bind Mounts"*,
+[Docker docs](https://docs.docker.com/storage/bind-mounts).
+- *"Docker Volumes"*,
+[Docker docs](https://docs.docker.com/storage/volumes).
 
 
 &nbsp;
