@@ -14,6 +14,7 @@ Known issues capture problems and describe solutions.
 5. [Issue 5:](#5-issue-5) *mysql_root*, *mysql --user=root ...* access denied
 6. [Issue 6:](#6-issue-6) *mysql* access denied
 7. [Issue 7:](#7-issue-7-container-mount-not-working) Container mount not working
+8. [Issue 8:](#8-issue-8-client-does-not-support-authentication-protocol) Client does not support authentication protocol
 
 
 &nbsp;
@@ -127,7 +128,8 @@ Alternatively, try the default root passwords:
 
 ```perl
 mysql --user=root --password=           # try empty password
-mysql --user=root --password=root       # "root" as root password
+mysql --user=root --password=password   # try password as password
+mysql --user=root --password=root       # try root as password
 ```
 
 Note that commands `mysql_root` and `mysql` are defined with project-specific
@@ -149,20 +151,40 @@ Log into the database as root-user and create user account manually.
 
 ```perl
 mysql --user=root --password=password       # log into database as root user
-
-mysql> CREATE USER 'freerider'...   # perform SQL-statements from file:
-                                    # db.mnt/init_users.sql
 ```
 
-Note that command `mysql` is overloaded in `/mnt/.env.sh` using arguments
-`--user="freerider" --password="free.ride"` (and few more).
-When sourced, `mysql` logs into the database under these credentials.
+Perform instructions in database:
 
-To call the native `mysql`-client, use the full path:
+```sql
+-- grant user 'root' all privileges on all databases
+CREATE USER 'root'@'%' IDENTIFIED BY 'password';
+GRANT ALL PRIVILEGES ON *.* TO 'root'@'%';
 
-```perl
-/usr/bin/mysql          # native mysql client
-mysql                   # function from /mnt/.env.sh with project settings
+-- grant user 'freerider' all privileges on database FREERIDER_DB
+CREATE USER 'freerider'@'%' IDENTIFIED BY 'free.ride';
+GRANT ALL PRIVILEGES ON FREERIDER_DB.* to 'freerider'@'%';
+```
+
+Test user accounts have been added:
+
+```sql
+SELECT host, user FROM mysql.user;
+```
+
+Output:
+
+```
++-----------+------------------+
+| host      | user             |
++-----------+------------------+
+| %         | freerider        | <-- added user 'freerider'
+| %         | root             | <-- added user 'root'
+| localhost | mysql.infoschema |
+| localhost | mysql.session    |
+| localhost | mysql.sys        |
+| localhost | root             |
++-----------+------------------+
+6 rows in set (0.00 sec)
 ```
 
 
@@ -385,6 +407,36 @@ mysql> select * from CUSTOMER;
 |  3 | Schulze, Tim | +49 171 2358124 | Active |
 +----+--------------+-----------------+--------+
 3 rows in set (0.00 sec)
+```
+
+
+&nbsp;
+
+---
+### 8.) Issue 8: Client does not support authentication protocol
+
+Symptom: although database server is running, login from the host system shows error:
+*"Client does not support authentication protocol requested by server; consider upgrading MySQL client."*
+
+Fixes:
+
+* Replace `localhost` with `127.0.0.1` in database connections.
+
+* Follow instructions at
+[stackoverflow](https://stackoverflow.com/questions/50093144/mysql-8-0-client-does-not-support-authentication-protocol-requested-by-server)
+
+1.) log into database: `mysql --user=root --password=password` and run
+
+```sql
+ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY 'password';
+FLUSH PRIVILEGES;
+```
+
+Try connecting. If that doesn't work, try without `@'localhost'` part:
+
+```sql
+ALTER USER 'root' IDENTIFIED WITH mysql_native_password BY 'password';
+FLUSH PRIVILEGES;
 ```
 
 
