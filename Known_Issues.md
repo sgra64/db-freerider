@@ -9,9 +9,9 @@ Known issues capture problems and describe solutions.
     with *GitBash*: *"failed to create shim task: OCI runtime create failed"*
 3. [Issue 3:](https://github.com/sgra64/docker-se2/blob/main/Known_Issues.md#3-issue-3)
     with *GitBash*: *"the input device is not a TTY"*
-4. [Issue 4:](#5-issue-4) *mysql_root*, *mysql --user=root ...* access denied
-5. [Issue 5:](#6-issue-5) *mysql* access denied
-6. [Issue 6:](#4-issue-6) No *File Sharing* option in Docker Desktop with
+4. [Issue 4:](#4-issue-4) *mysql_root*, *mysql --user=root ...* access denied
+5. [Issue 5:](#5-issue-5) *mysql* access denied
+6. [Issue 6:](#6-issue-6) No *File Sharing* option in Docker Desktop with
     *Windows HOME*.
 7. [Issue 7:](#7-issue-7-container-mount-not-working) Container mount not working
 8. [Issue 8:](#8-issue-8-client-does-not-support-authentication-protocol) Client does not support authentication protocol
@@ -95,7 +95,8 @@ CREATE USER 'freerider'@'%' IDENTIFIED BY 'free.ride';
 GRANT ALL PRIVILEGES ON FREERIDER_DB.* to 'freerider'@'%';
 ```
 
-Test user accounts have been added:
+Test user accounts have been added (see also
+[db.mnt/init_users.sql](https://github.com/sgra64/db-freerider/blob/main/db.mnt/init_users.sql)):
 
 ```sql
 SELECT host, user FROM mysql.user;
