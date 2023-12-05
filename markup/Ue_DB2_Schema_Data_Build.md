@@ -1,5 +1,4 @@
-
-## Übung D3: Schema- and Data-loading, Queries &nbsp; (<span style="color:red">10 Pts</span>)
+## Übung DB2: Schema- and Data-Build, Queries &nbsp; (10 Pts)
 
 &nbsp;
 
@@ -27,9 +26,9 @@ for problems.
 
 
 &nbsp;
-
 ---
 ### 1.) Challenge 1
+
 Data in a database is managed by a database server process `mysqld`
 ( *-d* for *daemon* process), which listens on a TCP network port.
 MySQL uses TCP port: *3306* as default port).
@@ -304,16 +303,16 @@ Output (with border lines):
 
 Repeat in IDE (here with Visual Studio Code SQLTools extension):
 
-![Customer Query with SQLTools](./img_30.png)
-
+<!-- ![Customer Query with SQLTools](./img_30.png) -->
+<img src="../markup/img/img_30.png" alt="drawing" width="640"/>
 
 (2 Pts)
 
 
 &nbsp;
-
 ---
 ### 2.) Challenge 2
+
 Loading the schema is the first step in building (rebuilding) a database.
 
 A database should always have an external `*_schema.sql`-file with SQL statements
@@ -389,7 +388,6 @@ Perform following tasks. Figure out where to input them (bash, mysql):
 
 
 &nbsp;
-
 ---
 ### 3.) Challenge 3
 
@@ -421,10 +419,11 @@ mysql> select count(*) from vehicle;
 
 (2 Pts)
 
-&nbsp;
 
+&nbsp;
 ---
 ### 4.) Challenge 4
+
 Running queries is a main use case for a database.
 
 ```
@@ -570,13 +569,13 @@ select ID, CUSTOMER_ID, VEHICLE_ID, BEGIN, END
 4 rows in set (0.00 sec)
 ```
 
-
 (2 Pts)
 
 &nbsp;
-
 ---
 ### 5.) Challenge 5
+
 Updating Data
 
 (2 Pts)
+
