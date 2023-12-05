@@ -24,7 +24,7 @@ Goal of this assignment is to build the database for a car sharing application
 
 Data-model for `FREERIDER_DB`:
 <!-- ![Datamodel](./img_20_UML.png) -->
-<img src="../markup/img/img_20_UML.png" alt="drawing" width="640"/>
+<img src="../markup/img/freerider_UML.png" alt="drawing" width="640"/>
 
 - Type `Location` is a `String` for pickup or drop location.
 
@@ -480,7 +480,7 @@ and a VEHICLE with two FOREIGN KEY (FK) attributes: `CUSTOMER_ID` and
 `VEHICLE_ID`.
 
 <!-- ![ERD](./img_21_ERD.png) -->
-<img src="../markup/img/img_21_ERD.png" alt="drawing" width="640"/>
+<img src="../markup/img/freerider_ERD.png" alt="drawing" width="640"/>
 
 [./db.mnt/init_freerider_schema.sql](https://github.com/sgra64/db-freerider/blob/main/db.mnt/init_freerider_schema.sql) contains the `SQL-Schema`,
 which starts with removing the old schema (and data) from the database
