@@ -1,4 +1,7 @@
-## Übung D2: DB Build with Docker &nbsp; (<span style="color:red">12 Pts</span>)
+## Übung DB1: DB-Server Build with Docker &nbsp; (12 Pts)
+
+&nbsp;
+
 [MySQL](https://www.mysql.com) is a popular open source
 ( [src](https://github.com/mysql/mysql-server) )
 Relational DataBase Management System (RDBMS) taking the #2 spot
@@ -20,7 +23,8 @@ Goal of this assignment is to build the database for a car sharing application
 *freerider* from a datamodel that is suitable for managing reservations:
 
 Data-model for `FREERIDER_DB`:
-![Datamodel](./img_20_UML.png)
+<!-- ![Datamodel](./img_20_UML.png) -->
+<img src="../markup/img/img_20_UML.png" alt="drawing" width="640"/>
 
 - Type `Location` is a `String` for pickup or drop location.
 
@@ -80,13 +84,14 @@ Building a database has the following steps:
 
 
 &nbsp;
-
 ---
 ### 1.) Challenge 1
+
 This step creates the structure for the DB project.
 Databases "need to be build" like any software. 
 
 Create the structure (scaffold) for project `db-freerider`:
+
 ```
 --<db-freerider>:           <-- new database build project
  |
@@ -129,12 +134,14 @@ Create the structure (scaffold) for project `db-freerider`:
 1. Also create `db_logs` directory with emtpy file `.touch` inside.
 
 Verify the result:
+
 ```
 cd db-freerider
 find .
 ```
 
 Output:
+
 ```
 .
 ./.env.sh
@@ -162,15 +169,16 @@ are available inside the container under path `/mnt`.
 The picture from lecture shows the relation between the host system (laptop) and the
 database container.
 
-![Datamodel](./img_22.jpg)
+<!-- ![Datamodel](./img_22.jpg) -->
+<img src="../markup/img/img_22.jpg" alt="drawing" width="640"/>
 
 (2 Pts)
 
 
 &nbsp;
-
 ---
 ### 2.) Challenge 2
+
 The container for the MySQL database server is built from the
 [mysql:8.0](https://github.com/docker-library/mysql/blob/e0d43b2a29867c5b7d5c01a8fea30a086861df2b/8.0/Dockerfile.oracle)
 base image.
@@ -208,8 +216,6 @@ db-freerider_MySQLServer                # container_name
 
 Make sure environment variables have been set **BEFORE** building the image.
 
-
-
 **Step 1: Building the image**
 
 using `Dockerfile` (must be in same directory):
@@ -226,6 +232,7 @@ docker build -t "${image_name}" --no-cache .    # . use Dockerfile here
 ```
 
 Output:
+
 ```
 building image: mysql/db-freerider_img:8.0
 [+] Building 2.9s (14/14) FINISHED
@@ -270,6 +277,7 @@ Mount points must be enabled by the host system. With Docker Desktop, open:
 `- Apply & Restart`.
 
 The full docker command for creating the container is:
+
 ```sh
 docker run \
     --name="${container_name}" \
@@ -286,8 +294,8 @@ docker run \
 
 Docker Desktop will display the new, running container (green box):
 
-![Datamodel](./img_23.png)
-
+<!-- ![Datamodel](./img_23.png) -->
+<img src="../markup/img/img_23.png" alt="drawing" width="640"/>
 
 **IMPORTANT:**
 
@@ -333,7 +341,6 @@ docker logs "db-freerider_MySQLServer"
 
 Wait for: `MySQL init process done. Ready for start up`.
 
-
 Show the running MySQL container:
 
 ```sh
@@ -343,7 +350,6 @@ CONTAINER ID   IMAGE                        COMMAND                  CREATED
 b9ef8d464ea8   mysql/db-freerider_img:8.0   "docker-entrypoint.s…"   56 minutes
 ago   Up 56 minutes   0.0.0.0:3306->3306/tcp, 33060/tcp   db-freerider_MySQLServ
 er
-
 ```
 
 Show the running `mysqld` database server inside the MySQL container:
@@ -357,7 +363,6 @@ STIME               TTY                 TIME                CMD
 root                13785               13466               0
 21:48               ?                   00:00:00            /bin/sh
 ```
-
 
 With the running database server, a `mysql` client can connect from
 either the host system (if you have a mysql client installed on your laptop)
@@ -409,6 +414,7 @@ mysql>
 ```
 
 when the client is connected to the server, SQL commands can be entered:
+
 ```
 mysql> show databases;
 +--------------------+
@@ -437,6 +443,7 @@ bash-4.4#
 ```
 
 Re-connect with `root` privileges:
+
 ```
 bash-4.4# mysql --user=root --password=password
 
@@ -461,9 +468,9 @@ bash-4.4#
 
 
 &nbsp;
-
 ---
 ### 3.) Challenge 3
+
 The datamodel for the *freerider* reservation system needs to be mapped
 to a database model, which is shown as Entity-Relationship ER-Diagram
 (ERD, [link](https://www.lucidchart.com/pages/er-diagrams) )
@@ -472,7 +479,8 @@ type `Reservation` representing the reservation relation between a CUSTOMER
 and a VEHICLE with two FOREIGN KEY (FK) attributes: `CUSTOMER_ID` and
 `VEHICLE_ID`.
 
-![ERD](./img_21_ERD.png)
+<!-- ![ERD](./img_21_ERD.png) -->
+<img src="../markup/img/img_21_ERD.png" alt="drawing" width="640"/>
 
 [./db.mnt/init_freerider_schema.sql](https://github.com/sgra64/db-freerider/blob/main/db.mnt/init_freerider_schema.sql) contains the `SQL-Schema`,
 which starts with removing the old schema (and data) from the database
@@ -502,9 +510,9 @@ When the database does not exist, MySQL will load the schema from the
 
 
 &nbsp;
-
 ---
 ### 4.) Challenge 4
+
 The schema file is available inside the container under the
 mount path: `/mnt/init_freerider_schema.sql`.
 
@@ -529,24 +537,27 @@ the extension [SQLTools](https://marketplace.visualstudio.com/items?itemName=mtx
 to the FREERIDER_DB with created tables (installation of an IDE plugin is
 recommended, but not required).
 
-![SQLTools](./img_24.png)
+<!-- ![SQLTools](./img_24.png) -->
+<img src="../markup/img/img_24.png" alt="drawing" width="640"/>
 
 The loaded database schema can be displayed with SQL:
+
 ```
 mysql> describe CUSTOMER;
 mysql> describe VEHICLE;
 mysql> describe RESERVATION;
 ```
 
-![SCHEMA](./img_25.png)
+<!-- ![SCHEMA](./img_25.png) -->
+<img src="../markup/img/img_25.png" alt="drawing" width="640"/>
 
 (3 Pts)
 
 
 &nbsp;
-
 ---
 ### 5.) Challenge 5
+
 Loading data into the database can be done by the SQL
 [INSERT INTO](https://www.w3schools.com/sql/sql_insert.asp) statement:
 
@@ -573,9 +584,9 @@ cat /mnt/init_freerider_data.sql | mysql --user=freerider --password=free.ride
 
 
 &nbsp;
-
 ---
 ### 6.) Challenge 6
+
 Execute DB Queries:
 
 ```
@@ -597,9 +608,9 @@ mysql> select * from CUSTOMER;
 
 
 &nbsp;
-
 ---
 ### 7.) Challenge 7
+
 Delete and rebuild MySQL-container from scratch.
 
 (2 Pts)
