@@ -1,0 +1,55 @@
+DEPRECATED: The legacy builder is deprecated and will be removed in a future rel
+ease.
+            Install the buildx component to build images with BuildKit:
+            https://docs.docker.com/go/buildx/
+
+Sending build context to Docker daemon  191.5kB
+Step 1/12 : FROM mysql:8.4
+ ---> 8f360cd2e6e4
+Step 2/12 : ENV MYSQL_NATIVE_PASSWORD="ON"
+ ---> Running in 25bbf134dbf5
+ ---> Removed intermediate container 25bbf134dbf5
+ ---> 1568e6affb6c
+Step 3/12 : ENV MYSQL_ALLOW_EMPTY_PASSWORD="yes"
+ ---> Running in 2bb20992ba16
+ ---> Removed intermediate container 2bb20992ba16
+ ---> 5ebf8a38747d
+Step 4/12 : ENV MYSQL_ROOT_PASSWORD=""
+ ---> Running in 7d8396083117
+ ---> Removed intermediate container 7d8396083117
+ ---> 5436e0dfd530
+Step 5/12 : ENV MYSQL_DATABASE="FREERIDER_DB"
+ ---> Running in 787082a1a6d1
+ ---> Removed intermediate container 787082a1a6d1
+ ---> 7c46909a5021
+Step 6/12 : ENV MYSQL_USER="freerider"
+ ---> Running in a87453436297
+ ---> Removed intermediate container a87453436297
+ ---> e524a3cd8508
+Step 7/12 : ENV MYSQL_PASSWORD="free.ride"
+ ---> Running in f13ea9c9fdf1
+ ---> Removed intermediate container f13ea9c9fdf1
+ ---> 02eb5eea803a
+Step 8/12 : ARG DB_INIT_FILE=/docker-entrypoint-initdb.d/db_init.sql
+ ---> Running in 61b6c18bcb4e
+ ---> Removed intermediate container 61b6c18bcb4e
+ ---> 7895ed1710d6
+Step 9/12 : COPY init-db/freerider-init-schema.sql /tmp
+ ---> 3463f8c6c533
+Step 10/12 : COPY init-db/freerider-init-data.sql /tmp
+ ---> 8b0ed44b5be4
+Step 11/12 : RUN cat /tmp/freerider-init-schema.sql >> $DB_INIT_FILE
+ ---> Running in bb0bf740afbd
+ ---> Removed intermediate container bb0bf740afbd
+ ---> ed8dddb2b44f
+Step 12/12 : RUN cat /tmp/freerider-init-data.sql   >> $DB_INIT_FILE
+ ---> Running in 1bb6755c6cd6
+ ---> Removed intermediate container 1bb6755c6cd6
+ ---> 7a2014517a71
+Successfully built 7a2014517a71
+Successfully tagged freerider-db-img:0.8
+
+SECURITY WARNING: You are building a Docker image from Windows against a non-Win
+dows Docker host. All files and directories added to build context will have '-r
+wxr-xr-x' permissions. It is recommended to double check and reset permissions f
+or sensitive files and directories.
