@@ -1,0 +1,41 @@
+# ignore unpublished solution files and folders
+*-complete
+*-comp
+*-full
+*-sol
+*-dev
+
+# ignore folders with branches
+branch/*
+branches/*
+
+# ignore archives and encoded files
+*.7z
+*.gz
+*.rar
+*.tar
+*.tgz
+*.tar.gz
+*.zip
+*.uue*
+
+# ignore generated docs and logs
+doc/*
+docs/*
+log/*
+logs/*
+*.log
+# except
+!logs/docker-build.log
+
+# ignore tmp directories and *.tmp files
+tmp/*
+temp/*
+*.tmp
+
+# ignore image and markup folders
+img/*
+markup/*
+
+# ignore OSX system files
+.DS_Store
