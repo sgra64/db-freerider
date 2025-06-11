@@ -1,0 +1,31 @@
+version: '3'
+name: freerider
+services:
+
+  # mysqlq service for the 'FREERIDER_DB'
+  freerider-db:
+    # use 'Dockerfile' in current directory '.' to build image
+    build: .
+    image: freerider-db-img:0.8
+    # 
+    # mount path where 'mysqld' stores data to volume
+    volumes:
+      - freerider-db-vol:/var/lib/mysql
+    # 
+    # map port to reach 'mysqld' process listening at port 3306
+    ports:
+      - 3306:3306
+
+# create volume if not present
+volumes:
+  freerider-db-vol:
+
+# env variables are passed through 'Dockerfile' (image)
+# freerider-db:
+  # environment:
+    # MYSQL_NATIVE_PASSWORD: on
+    # MYSQL_ALLOW_EMPTY_PASSWORD: yes
+    # MYSQL_ROOT_PASSWORD:
+    # MYSQL_DATABASE: "FREERIDER_DB"
+    # MYSQL_USER: "freerider"
+    # MYSQL_PASSWORD: "free.ride"
