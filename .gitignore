@@ -5,6 +5,12 @@
 *-sol
 *-dev
 
+TEST_DB.session.sql
+db-dump-schema.sql
+db-init/db-init-alter-h2.sql
+db-init/db-init-alter-mysql.sql
+
+
 # ignore folders with branches
 branch/*
 branches/*

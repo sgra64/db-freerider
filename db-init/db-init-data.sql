@@ -1,7 +1,19 @@
 -- 
 -- INITIAL DATA LOAD
 -- 
+USE TEST_DB;
 
+-- Perform entire data-load as one transaction (ACID)
+-- see: https://dev.mysql.com/doc/refman/8.4/en/commit.html
+-- 
+START TRANSACTION;
+
+-- keep order: delete RESERVATION before CUSTOMER, VEHICLE
+DELETE FROM RESERVATION;
+DELETE FROM VEHICLE;
+DELETE FROM CUSTOMER;
+
+-- keep order: insert CUSTOMER, VEHICLE before RESERVATION
 INSERT INTO CUSTOMER(ID, NAME, FIRSTNAME, CONTACT, STATUS, STATUS_CHANGE) VALUES
     (100, 'Eric',   'Meyer',    'eme22@gmail.com',      'Active',         '2024-06-04 12:35:00'),
     (101, 'Sommer', 'Tina',     '+49 030 22458 29425',  'Active',         '2025-10-07 10:28:00'),
@@ -31,3 +43,7 @@ INSERT INTO RESERVATION (ID, CUSTOMER_ID, VEHICLE_ID, TIME_BEGIN, TIME_END, PICK
     (351682, 102, 6000, '2025-11-14 10:00:00', '2025-11-17 16:30:00', 'Berlin Wedding', 'Hamburg', 'Cancelled'),
     (682351, 102, 6000, '2025-11-15 10:00:00', '2025-11-16 20:00:00', 'Potsdam', 'Teltow', 'Booked')
 ;
+
+
+-- commit transaction (implicit with SET autocommit = 1 (default))
+COMMIT;

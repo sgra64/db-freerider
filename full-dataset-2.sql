@@ -1,7 +1,12 @@
-USE TEST_DB;
+-- data load with: mysql -D FREERIDER_DB
+-- USE TEST_DB;
 
--- clear tables before inserting data, 'RESERVATION' must be deleted first and
--- inserted last due to FOREIGN KEY constraints to 'CUSTOMER' and 'VEHICLE'
+-- Perform entire data-load as one transaction (ACID)
+-- see: https://dev.mysql.com/doc/refman/8.4/en/commit.html
+-- 
+START TRANSACTION;
+
+-- keep order: delete RESERVATION before CUSTOMER, VEHICLE
 DELETE FROM RESERVATION;
 DELETE FROM VEHICLE;
 DELETE FROM CUSTOMER;
@@ -16,7 +21,7 @@ INSERT INTO CUSTOMER(ID, NAME, FIRSTNAME, CONTACT, STATUS, STATUS_CHANGE) VALUES
     (106, 'Erica',  'Gronemann','gronemann@gmx.de',     'InRegistration', '2022-02-26 07:02:00'),
     (107, 'Khaleed','Samadi',   '-',                    'Active',         '2020-09-24 18:00:00'),
     (108, 'Igor',   'Medwedev', 'gopnik@bht-berlin.de', 'InRegistration', '2025-11-28 23:26:00'),
-
+    --
     (109, 'Conrad-Grossmann', 'Annemarie', '040 57004653', 'Active', '2025-11-28 12:18:00'),
     (110, 'Becker', 'Emine', '0631 34210', 'Active', '2025-11-28 12:18:00'),
     (111, 'Hübner', 'Hanne', '', 'InRegistration', '2025-11-28 12:18:00'),
@@ -339,3 +344,7 @@ INSERT INTO RESERVATION (ID, CUSTOMER_ID, VEHICLE_ID, TIME_BEGIN, TIME_END, PICK
     (351682, 102, 8203, '2025-11-14 10:00:00', '2025-11-17 16:30:00', 'Berlin Wedding', 'Hamburg', 'Cancelled'),
     (682351, 102, 8270, '2025-11-15 10:00:00', '2025-11-16 20:00:00', 'Potsdam', 'Teltow', 'Booked')
 ;
+
+
+-- commit transaction (implicit with SET autocommit = 1 (default))
+COMMIT;
