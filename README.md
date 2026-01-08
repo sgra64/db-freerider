@@ -105,7 +105,7 @@ Steps:
 
 1. [Create a Docker Container based on that Image](#3-create-a-docker-container-based-on-that-image)
 
-1. [Attach Shell process (*"log-into Container"*)](#4-attach-shell-process-log-into-container)
+1. [Attach Shell Process (*"log-into Container"*)](#4-attach-shell-process-log-into-container)
 
 1. [*Log-into Database*](#5-log-into-database)
 
@@ -119,7 +119,9 @@ Steps:
 
 1. [Create/Load *Database Data*](#10-createLoad-database-data)
 
-1. [Connect from Application through *JDBC*](#11-connect-from-application-through-jdbc)
+1. [Connect from the Java-Application through *JDBC*](#11-connect-from-the-java-application-through-jdbc)
+
+1. [Build and Load Database *FREERIDER_DB*](#12-build-and-load-database-freerider_db)
 
 
 <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
@@ -287,7 +289,7 @@ docker start "mysqld-container"
 
 &nbsp;
 
-## 4. Attach Shell process (*"log-into Container"*)
+## 4. Attach Shell Process (*"log-into Container"*)
 
 Docker has no concept of *"logging into"* a container. Instead, a new *shell*
 process can be launched inside the container and connected (*"attached"*) to
@@ -501,7 +503,7 @@ SELECT * FROM STUDENT WHERE NAME in ('Bernier, A.', 'Blenau, H.');
 
 ## 7. *JOIN* Queries
 
-Create a new database *"DEPARTMENTS"* and run the examples for *JOIN* queries:
+Create a new database *"JOIN_DB"* and run the examples for *JOIN* queries:
 [*https://en.wikipedia.org/wiki/Join_(SQL)*](https://en.wikipedia.org/wiki/Join_(SQL))
 
 Understand:
@@ -519,7 +521,7 @@ Understand:
 
 ## 8. Create and Mount *Volume*
 
-No volume was used for the database examples. Database files were created
+No volume was used for the databases so far. Database files were created
 inside the container under path: `/var/lib/mysql`.
 
 ```sh
@@ -529,7 +531,7 @@ bash-5.1# cd /var/lib/mysql         # back to 'bash'
 bash-5.1# ls -la UNI                # show database files
 ```
 
-The database files appear:
+The database files appear under this path:
 
 ```
 total 232
@@ -546,19 +548,21 @@ will also be removed and database files lost.
 Docker considers containers as transient, not as permanent entities, which
 means containers should be removed and re-created at any time.
 
-Therefore, Docker containers *"should not keep state"* (the writeable images
-attached to them) and hence, external storage be used to store data, see
+Therefore, Docker containers *"should not keep state"* in the writeable image
+layer attached to a container, see
 [*"10 things to avoid in docker containers"*](https://developers.redhat.com/blog/2016/02/24/10-things-to-avoid-in-docker-containers).
 
-Docker has two methods to attach external storage to a container and *mount*
-into the container under a specified path:
+Docker has two methods to attach external storage to a container and *"mount"*
+that storage into the container filesystem under a specified path:
 
 - [*bind mount*](https://docs.docker.com/engine/storage/bind-mounts) --
-    mount a directory from the host system into a container under a specified
-    path (with host filesystem) and
+    mount a directory from the host system into a container under the specified
+    path (consider: the mounted directory is formatted for the host filesystem)
+    and
 
 - [*volume mount*](https://docs.docker.com/engine/storage/volumes) --
-    mount a logical disk into a container under a specified path.
+    a *logical disk* (volume) is mounted into the container filesystem
+    under a specified path formatted to match the container filesystem.
 
 
 Create a new *Volume* named *"mysqld-volume"*
@@ -622,9 +626,9 @@ Prepare a database schema file from the previous
 as a local file in the project directory `db-init-schema.sql` with
 content:
 
-1. Create a new database: `TEST_DB` (if not exists - for idempotency).
+1. Create a new database: `TEST_DB` (if not exists).
 
-1. select that database.
+1. Select that database.
 
 1. Load the schema for the three tables: *CUSTOMER*, *VEHICLE* and *RESERVATION*.
 
@@ -635,16 +639,14 @@ system into the container, and there, into the database server process *mysqld*
 using the *mysql* client:
 
 ```sh
-cnt="mysqld-container"          # set variable with container-name
-
 # make sure file 'db-init-schema.sql'
-cat db-init-schema.sql | docker exec -i $cnt mysql -D "TEST_DB"
+cat db-init-schema.sql | docker exec -i "mysqld-container" mysql -D "TEST_DB"
 ```
 
 Show the new database has been created:
 
 ```sh
-echo "SHOW DATABASES;" | docker exec -i $cnt mysql -D "TEST_DB"
+echo "SHOW DATABASES;" | docker exec -i "mysqld-container" mysql -D "TEST_DB"
 ```
 ```
 Database
@@ -658,7 +660,7 @@ sys
 Show tables of the new database:
 
 ```sh
-echo "USE TEST_DB; SHOW TABLES;" | docker exec -i $cnt mysql -D "TEST_DB"
+echo "USE TEST_DB; SHOW TABLES;" | docker exec -i "mysqld-container" mysql -D "TEST_DB"
 ```
 ```
 Tables_in_TEST_DB
@@ -670,7 +672,7 @@ VEHICLE
 Show the definition of the *CUSTOMER* table:
 
 ```sh
-echo "USE TEST_DB; DESCRIBE CUSTOMER;" | docker exec -i $cnt mysql -D "TEST_DB"
+echo "USE TEST_DB; DESCRIBE CUSTOMER;" | docker exec -i "mysqld-container" mysql -D "TEST_DB"
 ```
 ```
 +---------------+----------------------------------------------+------+-----+---------+----------------+
@@ -692,7 +694,7 @@ command:
 
 ```sh
 # extract schema-dump from 'TEST_DB' and save to file 'db-dump-schema.sql'
-echo "mysqldump --no-data TEST_DB" | docker exec -i $cnt /bin/bash | \
+echo "mysqldump --no-data TEST_DB" | docker exec -i "mysqld-container" /bin/bash | \
     tee db-dump-schema.sql
 ```
 
@@ -714,25 +716,285 @@ Load the file into the database server, e.g. by.
 
 ```sh
 # make sure file 'db-init-schema.sql'
-cat db-init-data.sql | docker exec -i $cnt mysql -D "TEST_DB"
+cat db-init/db-init-data.sql | docker exec -i "mysqld-container" mysql -D "TEST_DB"
 ```
 
+Attach a terminal shell to the container and log into the database:
+
+```sh
+docker exec -it mysqld-container /bin/bash
+```
+```
+bash-5.1# mysql -u root
+...
+mysql> show databases;
+```
+```
++--------------------+
+| Database           |
++--------------------+
+| TEST_DB            |  <-- TEST_DB
+| information_schema |
+| mysql              |
+| performance_schema |
+| sys                |
++--------------------+
+5 rows in set (0.00 sec)
+```
+
+Show tables with loaded data:
+
+```
+mysql> use TEST_DB;
+Database changed
+
+mysql> select * from CUSTOMER;
+mysql> select * from VEHICLE;
+mysql> select * from RESERVATION;
+```
+
+```
++-----+-----------+-----------+----------------------+----------------+---------------------+
+| ID  | NAME      | FIRSTNAME | CONTACT              | STATUS         | STATUS_CHANGE       |
++-----+-----------+-----------+----------------------+----------------+---------------------+
+| 100 | Eric      | Meyer     | eme22@gmail.com      | Active         | 2024-06-04 12:35:00 |
+| 101 | Sommer    | Tina      | +49 030 22458 29425  | Active         | 2025-10-07 10:28:00 |
+| 102 | Schulze   | Tim       | +49 171 2358124      | Active         | 2024-12-28 18:00:00 |
+| 103 | Brinkmann | Tobias    | +49 030 662465724    | InRegistration | 2025-11-28 12:18:00 |
+| 104 | Tony      | Allister  | +49 030 24253134     | Active         | 2023-02-10 18:00:00 |
+| 105 | Sandra    | Ohlstadt  | ohlst@gmail.com      | Active         | 2023-08-17 18:00:00 |
+| 106 | Erica     | Gronemann | gronemann@gmx.de     | InRegistration | 2022-02-26 07:02:00 |
+| 107 | Khaleed   | Samadi    | -                    | Active         | 2020-09-24 18:00:00 |
+| 108 | Igor      | Medwedev  | gopnik@bht-berlin.de | InRegistration | 2025-11-28 23:26:00 |
++-----+-----------+-----------+----------------------+----------------+---------------------+
+9 rows in set (0.00 sec)
+
++------+----------+---------------+-------+----------+----------+----------+
+| ID   | MAKE     | MODEL         | SEATS | CATEGORY | POWER    | STATUS   |
++------+----------+---------------+-------+----------+----------+----------+
+| 1001 | VW       | Golf          |     4 | Sedan    | Gasoline | Active   |
+| 1002 | VW       | Golf          |     4 | Sedan    | Hybrid   | Active   |
+| 1200 | VW       | Multivan Life |     8 | Van      | Gasoline | Active   |
+| 2000 | BMW      | 320d          |     4 | Sedan    | Diesel   | Active   |
+| 3000 | Mercedes | EQS           |     4 | Sedan    | Electric | Active   |
+| 6000 | Tesla    | Model 3       |     4 | Sedan    | Electric | Active   |
+| 6001 | Tesla    | Model S       |     4 | Sedan    | Electric | Serviced |
++------+----------+---------------+-------+----------+----------+----------+
+7 rows in set (0.00 sec)
+
++--------+-------------+------------+---------------------+---------------------+----------------+----------------+-----------+
+| ID     | CUSTOMER_ID | VEHICLE_ID | TIME_BEGIN          | TIME_END            | PICKUP         | DROPOFF        | STATUS    |
++--------+-------------+------------+---------------------+---------------------+----------------+----------------+-----------+
+| 145373 |         102 |       6001 | 2025-11-18 08:00:00 | 2025-11-20 08:00:00 | Berlin Wedding | Hamburg        | Booked    |
+| 201235 |         103 |       1002 | 2025-11-17 10:00:00 | 2025-11-17 18:00:00 | Berlin Wedding | Berlin Wedding | Booked    |
+| 351682 |         102 |       6000 | 2025-11-14 10:00:00 | 2025-11-17 16:30:00 | Berlin Wedding | Hamburg        | Cancelled |
+| 382565 |         102 |       3000 | 2025-11-16 09:00:00 | 2025-11-17 09:00:00 | Berlin Wedding | Hamburg        | Inquired  |
+| 682351 |         102 |       6000 | 2025-11-15 10:00:00 | 2025-11-16 20:00:00 | Potsdam        | Teltow         | Booked    |
++--------+-------------+------------+---------------------+---------------------+----------------+----------------+-----------+
+5 rows in set (0.00 sec)
+```
 
 
 <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
 
 &nbsp;
 
-## 11. Connect from Application through *JDBC*
+## 11. Connect from the Java-Application through *JDBC*
 
-After schema-load and data-load has been successful for the *TEST_DB*, build
-the actual database `FREERIDER_DB` with the same schema and the full
-dataset:
+Reconfigure the Java-appliction to connect to the *MySQL* database server in
+[*application.properties*](https://github.com/sgra64/mvn-fun/blob/mvn-jdbc-h2/src/main/resources/application.properties):
 
 ```sh
-# make sure file 'db-init-data.sql'
-cat db-init-data.sql | docker exec -i $cnt mysql -D "TEST_DB"
+# MySQL database configuration
+database.url = jdbc:mysql://localhost:3306/TEST_DB
+database.user = root
+database.password = 
 ```
+
+Running the program shows the three tables.
+
+Add a new record to `TEST_DB` at the *MySQL*-server:
+
+```sql
+INSERT INTO CUSTOMER (ID, NAME, FIRSTNAME, CONTACT, STATUS, STATUS_CHANGE) VALUES
+    (109, 'Moritz', 'Weimer', 'mowei@gmail.com', 'Active', '2026-01-04 08:52:00');
+```
+
+The new record shows when re-running the application.
+
+
+<!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+
+&nbsp;
+
+## 12. Build and Load Database *FREERIDER_DB*
+
+After the process of building and loading data into `TEST_DB` has worked, the
+actual database `FREERIDER_DB` is built.
+
+`FREERIDER_DB` will use the same schema, but a larger data set (more customer
+records, vehicles).
+
+Furthermore, `FREERIDER_DB` will use improved access control with username and
+passwort, which needs to be configured.
+
+See also:
+[*8.2.8 Adding Accounts, Assigning Privileges, and Dropping Accounts*](https://dev.mysql.com/doc/refman/8.0/en/creating-accounts.html)
+
+
+Steps:
+
+#### 1. Create Database *FREERIDER_DB* and load the Schema
+
+Load the same schema from `TEST_DB`.
+
+
+#### 2. Load Data into the Database
+
+Load the full data-set into the database:
+[*full-dataset-2.sql*](full-dataset-2.sql)
+
+
+#### 3. Configure Access
+
+Since data has always been most important in business, relational databases
+provide fine-grained control of who can access which data and which operations
+are permitted based on:
+
+- *Host-level:* controls from where connections to the database server
+    are permitted (*localhost* only or certain IP-Addresses or IP-ranges).
+
+- *Connection-level:* (authentication) controls which identity (abstract
+    term for a *"user"* as registered entity in the database server) is
+    permitted to connect and from where (from *localhost* only or from
+    certain IP-Addresses or IP-ranges).
+
+- *Roles:* are groupings of identities assigned to Access-Rights.
+
+- *Access Rights:* (authorization) define access privileges for *Roles*:
+    - Create,
+    - Read,
+    - Write (insert, update),
+    - Delete.
+
+    on assets:
+    - Databases,
+    - Tables.
+
+For example, project manager and member roles (*MGR_ROLE*, *MBR_ROLE*) can be
+configured. Users *Alan*, *Tracy* and *Max* are assigned project member roles.
+In addition, *Alan* is assigned the project manager role.
+
+In a *Contracts* database, it can be configured that project members have only
+read access (SELECT) while the manager has also write access (INSERT, UPDATE).
+
+When *Tracy* connects under her identity to the database, she can only perform
+operatione granted to her role. *Alan* can perform additional operations according
+to his manager role. Other users cannot connect to the database.
+
+For administration of access rights, pre-configured databases are used. In case
+of *MySQL*, this is the database *mysql*:
+
+```
+mysql> show databases;
+```
+```
++--------------------+
+| Database           |
++--------------------+
+| TEST_DB            |
+| information_schema |
+| mysql              |  <--
+| performance_schema |
+| sys                |
++--------------------+
+5 rows in set (0.00 sec)
+```
+
+Access to this database required `'root'`-access. Log into the database as
+root (with empty root password):
+
+```sh
+mysql --user=root --password=""
+```
+```mysql
+mysql> use mysql;
+Database changed
+
+mysql> show tables;
+```
+
+The database has 38 tables, some of which are:
+
+```
++------------------------------------------------------+
+| Tables_in_mysql                                      |
++------------------------------------------------------+
+| default_roles                                        |
+| func                                                 |
+| general_log                                          |
+| global_grants                                        |
+| password_history                                     |
+| plugin                                               |
+| procs_priv                                           |
+| role_edges                                           |
+| servers                                              |
+| slow_log                                             |
+| tables_priv                                          |
+| time_zone                                            |
+| time_zone_leap_second                                |
+| user                                                 |    <-- 'user' table
++------------------------------------------------------+
+38 rows in set (0.00 sec)
+```
+
+Table *user* contains 51 columns to store information about identities and
+access privileges:
+
+```sql
+show columns from user;
+```
+
+Add an identity (*"user account"*): `freerider` with password: `free.ride`
+to connect to the `FREERIDER_DB`:
+
+```sql
+-- grant user 'root' all privileges on all databases
+CREATE USER 'root'@'%' IDENTIFIED BY 'password';
+GRANT ALL PRIVILEGES ON *.* TO 'root'@'%';
+
+-- grant user 'freerider' all privileges on database FREERIDER_DB
+CREATE USER 'freerider'@'%' IDENTIFIED BY 'free.ride';
+GRANT ALL PRIVILEGES ON FREERIDER_DB.* to 'freerider'@'%';
+```
+
+
+#### 4. Re-Configure the Java-Application
+
+Reconfigure the Java-appliction to connect to the *FREERIDER_DB* database
+using credentials in
+[*application.properties*](https://github.com/sgra64/mvn-fun/blob/mvn-jdbc-h2/src/main/resources/application.properties):
+
+```sh
+# Configuration for the 'FREERIDER_DB' using credentials
+database.url = jdbc:mysql://localhost:3306/FREERIDER_DB
+database.user = freerider
+database.password = free.ride
+```
+
+Running the program shows the three tables, now with full content of the *FREERIDER_DB*.
+
+```sql
+select count(*) from CUSTOMER;
+select count(*) from VEHICLE;
+select count(*) from RESERVATION;
+```
+
+- *CUSTOMERS*: 37 rows,
+- *VEHICLES*: 273 rows,
+- *RESERVATIONS*: 5 rows.
+
+Keep the `FREERIDER_DB` database for forthcoming assignments.
 
 
 
