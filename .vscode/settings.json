@@ -1,32 +1,42 @@
 {
-    "sqltools.connections": [
-        {
-            "mysqlOptions": {
-                "authProtocol": "default",
-                "charset": "utf8mb4_general_ci"
-            },
-            "previewLimit": 50,
-            "server": "localhost",
-            "port": 3306,
-            "driver": "MySQL",
-            "name": "TEST_DB",
-            "database": "TEST_DB",
-            "username": "root",
-            "password": ""
-        },
-        {
-            "mysqlOptions": {
-                "authProtocol": "default",
-                "charset": "utf8mb4_general_ci"
-            },
-            "previewLimit": 50,
-            "server": "localhost",
-            "port": 3306,
-            "driver": "MySQL",
-            "name": "FREERIDER_DB",
-            "database": "FREERIDER_DB",
-            "username": "freerider",
-            "password": "free.ride"
+    // database connections
+    "sqltools.connections": [ {
+        "name": "Local MySQL Server (DB UNI)",
+        "driver": "MySQL",
+        "server": "localhost",
+        "port": 3306,
+        "username": "root",
+        "password": "",
+        "database": "UNI",
+        "mysqlOptions": {
+            "authProtocol": "default"
         }
-    ]
+    }, {
+        "name": "Local MySQL Server (EMPLOYEES)",
+        "driver": "MySQL",
+        "server": "localhost",
+        "port": 3306,
+        "username": "root",
+        "password": "",
+        "database": "EMPLOYEES",
+        "mysqlOptions": {
+            "authProtocol": "default"
+        }
+    }, {
+        "name": "Local MySQL Server (FREERIDER_DB)",
+        "driver": "MySQL",
+        "server": "localhost",
+        "port": 3306,
+        "database": "FREERIDER_DB",
+        "username": "freerider",
+        "password": "free.ride",
+        "mysqlOptions": {
+            "authProtocol": "default"
+        }
+    }, ],
+    // show query results in same output window
+    "sqltools.results.reuseTabs": "connection",
+    // 
+    // open query results window vertically
+    // "workbench.editor.openSideBySideDirection": "down"
 }
