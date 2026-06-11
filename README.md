@@ -113,6 +113,14 @@ Steps:
 
 1. [*JOIN* Queries](#7-join-queries)
 
+    - a) [*Cross Join*](#a-cross-join)
+
+    - b) [*Inner Join*](#b-inner-join)
+
+    - c) [*Outer Join (left, right)*](#c-outer-join-left-right)
+
+    - d) [*Full Join*](#d-full-join)
+
 1. [Create and Mount *Volume*](#8-create-and-mount-volume)
 
 1. [Create/Load *Database Schema*](#9-createload-database-schema)
@@ -502,7 +510,7 @@ SELECT * FROM STUDENT WHERE NAME in ('Bernier, A.', 'Blenau, H.');
 &nbsp;
 
 ## 7. *JOIN* Queries
-
+<!-- 
 Create a new database *"JOIN_DB"* and run the examples for *JOIN* queries:
 [*https://en.wikipedia.org/wiki/Join_(SQL)*](https://en.wikipedia.org/wiki/Join_(SQL))
 
@@ -512,7 +520,263 @@ Understand:
 
 - *Inner JOIN*,
 
-- *Outer JOIN* (left, right).
+- *Outer JOIN* (left, right). -->
+
+
+Build a new database *"Employees"* from the
+[*example*](https://en.wikipedia.org/wiki/Join_(SQL))
+demonstrating the use of *SQL JOIN* queries.
+
+Create tables: *"department"* and *"employee"* as shown in the example.
+Fill in sample data.
+
+Run queries:
+
+```sql
+SELECT * FROM employee;
+SELECT * FROM department;
+```
+
+```
+mysql> SELECT * FROM employee;          mysql> SELECT * FROM department;
++------------+--------------+           +--------------+----------------+
+| LastName   | DepartmentID |           | DepartmentID | DepartmentName |
++------------+--------------+           +--------------+----------------+
+| Rafferty   |           31 |           |           31 | Sales          |
+| Jones      |           33 |           |           33 | Engineering    |
+| Heisenberg |           33 |           |           34 | Clerical       |
+| Robinson   |           34 |           |           35 | Marketing      |
+| Smith      |           34 |           +--------------+----------------+
+| Williams   |         NULL |           4 rows in set (0.00 sec)
++------------+--------------+
+6 rows in set (0.01 sec)
+```
+
+
+### a) *Cross Join*
+
+The full *cross-join* (*cross product* or
+[*cartesian product*](https://en.wikipedia.org/wiki/Cartesian_product))
+combines attributes (columns) of both tables and each line of the first table
+with each line of the second table (rows).
+
+```sql
+-- CROSS JOIN creates full cross product (carthesian product) of the two tables
+SELECT * FROM employee CROSS JOIN department;
+SELECT * FROM employee, department;
+```
+
+*Cross join* does not connect attributes (columns) and always spawns the
+full table. Rows can be selected with WHERE.
+
+*Inner join* connect attributes (columns) from both tables, e.g. attribute
+*DepartmentID* to only include matching rows, in the example *departments*
+in which *employees* are working (omitting none-mathching rows).
+
+Queries yield output of the full *cross product* of the two tables.
+
+```
++------------+--------------+--------------+----------------+
+| LastName   | DepartmentID | DepartmentID | DepartmentName |
++------------+--------------+--------------+----------------+
+| Rafferty   |           31 |           35 | Marketing      |
+| Rafferty   |           31 |           34 | Clerical       |
+| Rafferty   |           31 |           33 | Engineering    |
+| Rafferty   |           31 |           31 | Sales          | <-- matching DepartmentId
+| Jones      |           33 |           35 | Marketing      |     (33=33)
+| Jones      |           33 |           34 | Clerical       |
+| Jones      |           33 |           33 | Engineering    | <-- matching DepartmentId
+| Jones      |           33 |           31 | Sales          |     (33=33)
+| Heisenberg |           33 |           35 | Marketing      |
+| Heisenberg |           33 |           34 | Clerical       |
+| Heisenberg |           33 |           33 | Engineering    | <-- matching DepartmentId
+| Heisenberg |           33 |           31 | Sales          |     (33=33)
+| Robinson   |           34 |           35 | Marketing      |
+| Robinson   |           34 |           34 | Clerical       | <-- matching DepartmentId
+| Robinson   |           34 |           33 | Engineering    |     (34=34)
+| Robinson   |           34 |           31 | Sales          |
+| Smith      |           34 |           35 | Marketing      |
+| Smith      |           34 |           34 | Clerical       | <-- matching DepartmentId
+| Smith      |           34 |           33 | Engineering    |     (34=34)
+| Smith      |           34 |           31 | Sales          |
+| Williams   |         NULL |           35 | Marketing      |
+| Williams   |         NULL |           34 | Clerical       |
+| Williams   |         NULL |           33 | Engineering    |
+| Williams   |         NULL |           31 | Sales          |
++------------+--------------+--------------+----------------+
+24 rows in set (0.00 sec)
+```
+
+
+### b) *Inner Join*
+
+The *"explicit join notation"* uses the *JOIN* keyword, optionally preceded
+by the *INNER* keyword, to specify the table to join, and the *ON* keyword
+to specify the predicates for the join, as in the following example:
+
+```sql
+-- INNER JOIN selects rows of matching linkage attributes from both tables
+-- explicit join notation linking both tables via 'DepartmentID'
+SELECT * FROM employee INNER JOIN department ON
+    employee.DepartmentID = department.DepartmentID;
+
+-- equi-join notation omits 'INNER'
+SELECT * FROM employee JOIN department ON
+    employee.DepartmentID = department.DepartmentID;
+```
+
+The *"implicit join notation"* replaces: `FROM employee INNER JOIN department ON`
+with listing both (or more) tables after FROM: `FROM employee, department` and
+using a regular WHERE clause to specify the join condition (the linkage
+between the tables):
+
+```sql
+-- implicit join notation lists tables after FROM and links tables with WHERE clause
+SELECT * FROM employee, department
+    WHERE employee.DepartmentID = department.DepartmentID;
+```
+
+Both queries show only rows with matching *DepartmentID* from both tables:
+
+```
++------------+--------------+--------------+----------------+
+| LastName   | DepartmentID | DepartmentID | DepartmentName |
++------------+--------------+--------------+----------------+
+| Rafferty   |           31 |           31 | Sales          |
+| Jones      |           33 |           33 | Engineering    |
+| Heisenberg |           33 |           33 | Engineering    |
+| Robinson   |           34 |           34 | Clerical       |
+| Smith      |           34 |           34 | Clerical       |
++------------+--------------+--------------+----------------+
+5 rows in set (0.00 sec)
+```
+
+Further variations of joins are *"equi-join"* and *"natural join"* that
+consolidate the linkage attributes from both tables into one attribute,
+here *DepartmentID*.
+
+*"Natural join"* is a special form of an *"equi-join"* with implicit
+matching of column names to link tables.
+
+```sql
+-- equi-join notation with 'USING'
+SELECT * FROM employee JOIN department USING (DepartmentID);
+
+-- natural join notation with implicit column name matching between tables
+SELECT * FROM employee NATURAL JOIN department;
+```
+
+Output shows one consolidated *DepartmentID* column:
+
+```
++--------------+------------+----------------+
+| DepartmentID | LastName   | DepartmentName |
++--------------+------------+----------------+
+|           31 | Rafferty   | Sales          |
+|           33 | Jones      | Engineering    |
+|           33 | Heisenberg | Engineering    |
+|           34 | Robinson   | Clerical       |
+|           34 | Smith      | Clerical       |
++--------------+------------+----------------+
+5 rows in set (0.00 sec)
+```
+
+
+### c) *Outer Join (left, right)*
+
+*"Outer Join"* considers the case of none-matching linkeage attributes,
+which are omitted in the resulting table for *inner joins*.
+*Outer joins* retain such rows and further subdivide into *"left joins"*
+(rows from the left table with none-matching attributes are included) and
+*"right joins"* (rows from the right table are included accordingly).
+
+In the example, employee *Williams* has no valid *DepartmentId* (NULL)
+and hence was excluded in *"inner joins"* before.
+
+```sql
+-- Left-outer-join includes rows from the left table with none-matching
+-- linkeage attributes
+SELECT * FROM employee LEFT OUTER JOIN department ON
+    employee.DepartmentID = department.DepartmentID;
+```
+
+Output shows the row of employee Williams with a none-matching linkeage
+attribute (NULL) from the left table (employee) included with attributes
+from the right table filled with NULL:
+
+```
++------------+--------------+--------------+----------------+
+| LastName   | DepartmentID | DepartmentID | DepartmentName |
++------------+--------------+--------------+----------------+
+| Rafferty   |           31 |           31 | Sales          |
+| Jones      |           33 |           33 | Engineering    |
+| Heisenberg |           33 |           33 | Engineering    |
+| Robinson   |           34 |           34 | Clerical       |
+| Smith      |           34 |           34 | Clerical       |
+| Williams   |         NULL |         NULL | NULL           | <-- include 'Williams'
++------------+--------------+--------------+----------------+     from left table
+6 rows in set (0.00 sec)
+```
+
+Similarly, a *"right outer join"* fills in rows from the right table
+with no matches in likeage attributes. In the example, department
+*Marketing* was not matched by any employee record.
+
+```sql
+-- Right-outer-join includes rows from the right table with none-matching
+-- linkeage attributes
+SELECT * FROM employee RIGHT OUTER JOIN department ON
+    employee.DepartmentID = department.DepartmentID;
+```
+
+```
++------------+--------------+--------------+----------------+
+| LastName   | DepartmentID | DepartmentID | DepartmentName |
++------------+--------------+--------------+----------------+
+| Rafferty   |           31 |           31 | Sales          |
+| Heisenberg |           33 |           33 | Engineering    |
+| Jones      |           33 |           33 | Engineering    |
+| Smith      |           34 |           34 | Clerical       |
+| Robinson   |           34 |           34 | Clerical       |
+| NULL       |         NULL |           35 | Marketing      | <-- include 'Marketing'
++------------+--------------+--------------+----------------+     from right table
+6 rows in set (0.01 sec)
+```
+
+
+### d) *Full Outer Join*
+
+Finally, a *"full outer join"* includes rows from both tables
+with no matches in likeage attributes.
+
+```sql
+-- Full-outer-join includes rows from the both tables with none-matching
+-- linkeage attributes (MySQL does not support full-outer-join syntax)
+SELECT * FROM employee FULL OUTER JOIN department ON
+  employee.DepartmentID = department.DepartmentID;
+
+-- emulated full-outer-join as UNION of left- and right-outer joins
+SELECT * FROM employee
+  LEFT JOIN department ON employee.DepartmentID = department.DepartmentID
+  UNION
+  SELECT * FROM employee
+  RIGHT JOIN department ON employee.DepartmentID = department.DepartmentID;
+```
+
+```
++------------+--------------+--------------+----------------+
+| LastName   | DepartmentID | DepartmentID | DepartmentName |
++------------+--------------+--------------+----------------+
+| Rafferty   |           31 |           31 | Sales          |
+| Jones      |           33 |           33 | Engineering    |
+| Heisenberg |           33 |           33 | Engineering    |
+| Robinson   |           34 |           34 | Clerical       |
+| Smith      |           34 |           34 | Clerical       |
+| Williams   |         NULL |         NULL | NULL           | <-- include 'Williams'
+| NULL       |         NULL |           35 | Marketing      | <-- include 'Marketing'
++------------+--------------+--------------+----------------+
+7 rows in set (0.00 sec)
+```
 
 
 <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
