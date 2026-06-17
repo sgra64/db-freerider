@@ -126,11 +126,12 @@ Steps:
 1. [Create/Load *Database Schema*](#9-createload-database-schema)
 
 1. [Create/Load *Database Data*](#10-createLoad-database-data)
-
+<!-- 
+moved to E1:
 1. [Connect from the Java-Application through *JDBC*](#11-connect-from-the-java-application-through-jdbc)
 
 1. [Build and Load Database *FREERIDER_DB*](#12-build-and-load-database-freerider_db)
-
+ -->
 
 <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
 
@@ -1060,7 +1061,7 @@ mysql> select * from RESERVATION;
 
 
 <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
-
+<!-- 
 &nbsp;
 
 ## 11. Connect from the Java-Application through *JDBC*
@@ -1085,10 +1086,10 @@ INSERT INTO CUSTOMER (ID, NAME, FIRSTNAME, CONTACT, STATUS, STATUS_CHANGE) VALUE
 ```
 
 The new record shows when re-running the application.
-
+ -->
 
 <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
-
+<!-- 
 &nbsp;
 
 ## 12. Build and Load Database *FREERIDER_DB*
@@ -1260,7 +1261,7 @@ select count(*) from RESERVATION;
 
 Keep the `FREERIDER_DB` database for forthcoming assignments.
 
-
+ -->
 
 <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
 <!-- TEMPLATE -->
