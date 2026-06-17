@@ -23,6 +23,17 @@
             "authProtocol": "default"
         }
     }, {
+        "name": "Local MySQL Server (TEST_DB)",
+        "driver": "MySQL",
+        "server": "localhost",
+        "port": 3306,
+        "username": "root",
+        "password": "",
+        "database": "TEST_DB",
+        "mysqlOptions": {
+            "authProtocol": "default"
+        }
+    }, {
         "name": "Local MySQL Server (FREERIDER_DB)",
         "driver": "MySQL",
         "server": "localhost",
@@ -38,5 +49,5 @@
     "sqltools.results.reuseTabs": "connection",
     // 
     // open query results window vertically
-    // "workbench.editor.openSideBySideDirection": "down"
+    "workbench.editor.openSideBySideDirection": "down"
 }
