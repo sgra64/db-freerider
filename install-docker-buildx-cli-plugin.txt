@@ -1,0 +1,14 @@
+DOCKER_BUILDKIT=0 docker build -t mysql-demo-image .
+DOCKER_BUILDKIT=1 docker build -t mysql-demo-image .
+# 
+# install buildx - CLI-plugin:
+# 
+# Windows (installs to: C:\Users\svgr2\.docker\cli-plugins\docker-buildx.exe):
+# HOME_WIN="/c/Users/svgr2" && HOME_WIN="$APPDATA/../.." && curl -SL https://github.com/docker/buildx/releases/download/v0.19.1/buildx-v0.19.1.windows-amd64.exe -o $HOME_WIN/.docker/cli-plugins/docker-buildx.exe
+# 
+# PowerShell: Invoke-WebRequest "https://github.com/docker/buildx/releases/download/v0.19.1/buildx-v0.19.1.windows-amd64.exe" -OutFile "$HOME\.docker\cli-plugins\docker-buildx.exe"
+# 
+# Linux:
+curl -SL https://github.com/docker/buildx/releases/download/v0.19.1/buildx-v0.19.1.linux-amd64 -o ~/.docker/cli-plugins/docker-buildx
+# 
+# install to WINDOWS HOME directory: C:\Users\svgr2\.docker\cli-plugins

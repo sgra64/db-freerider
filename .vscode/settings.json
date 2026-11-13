@@ -1,0 +1,14 @@
+{
+  "sqltools.connections": [
+    {
+      "name": "mysql-demo-container",
+      "driver": "MySQL",
+      "previewLimit": 50,
+      "server": "127.0.0.1",
+      "port": 3306,
+      "database": "demo_DB",
+      "username": "root",
+      "password": ""
+    }
+  ]
+}

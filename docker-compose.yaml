@@ -1,0 +1,26 @@
+services:
+  mysql-demo-db:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: mysql-demo-image:latest
+    container_name: mysql-demo-container
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: 
+      MYSQL_DATABASE: demo_DB
+    ports:
+      - "3306:3306"
+#     volumes:
+#       - mysql_data:/var/lib/mysql
+# volumes:
+#   mysql_data:
+
+# freerider-db:
+  # environment:
+    # MYSQL_NATIVE_PASSWORD: on
+    # MYSQL_ALLOW_EMPTY_PASSWORD: yes
+    # MYSQL_ROOT_PASSWORD:
+    # MYSQL_DATABASE: "FREERIDER_DB"
+    # MYSQL_USER: "freerider"
+    # MYSQL_PASSWORD: "free.ride"
