@@ -1,0 +1,41 @@
+#------------------------------------------------------------------------------
+# .gitignore with patterns of files and directories to be ignored by git.
+# //
+# see: https://www.atlassian.com/git/tutorials/saving-changes/gitignore
+#------------------------------------------------------------------------------
+
+# ignore patch files
+*.patch
+
+# ignore other archives and encoding files
+*.7z
+*.gz
+*.rar
+*.tar
+*.tgz
+*.tar.gz
+*.zip
+*.uue*
+
+# ignore folders with branches
+branch/
+branches/
+
+# ignore folders with javadoc (generated)
+doc/
+docs/
+
+# ignore log directories and *.log files (generated)
+log/
+logs/
+*.log
+
+# ignore tmp directories, *.tmp and .BAK files
+tmp/
+temp/
+*.tmp
+*.BAK
+*.bak
+
+# ignore OSX hidden files (Mac)
+.DS_Store
